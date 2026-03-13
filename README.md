@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MAT Fácil 🧮
 
-## Getting Started
+Plataforma de aprendizado de matemática para alunos do SESI. Aprenda de forma divertida e interativa com gamificação, níveis e XP.
 
-First, run the development server:
+## Stack
+
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript
+- **Estilo**: TailwindCSS v4, Shadcn UI (base-ui), Framer Motion
+- **Fontes**: Inter (corpo), Space Grotesk (headings)
+- **Tema**: Dark mode nativo
+- **Backend**: Supabase (Auth, PostgreSQL, Storage)
+- **Ícones**: Lucide React
+
+## Funcionalidades
+
+- ✅ Autenticação (login, cadastro, recuperação de senha)
+- ✅ Perfis de usuário (aluno e admin)
+- ✅ Dashboard personalizado com nível e XP
+- ✅ Matérias, assuntos e aulas organizadas
+- ✅ Sistema de gamificação (XP, 10 níveis, histórico de pontos)
+- ✅ Painel admin com CRUD completo (matérias, assuntos, aulas)
+- ✅ Ranking de alunos
+- ✅ Proteção de rotas por autenticação e role
+- 🔜 Exercícios interativos
+- 🔜 Tutor com IA
+- 🔜 Badges e conquistas
+
+## Configuração
+
+### 1. Clonar e instalar dependências
+
+```bash
+git clone <repo>
+cd mat-facil
+npm install
+```
+
+### 2. Configurar variáveis de ambiente
+
+```bash
+cp env.example .env.local
+```
+
+Edite `.env.local` com suas credenciais do Supabase:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+```
+
+### 3. Configurar o banco de dados Supabase
+
+1. Crie um projeto em [supabase.com](https://supabase.com)
+2. Vá em **SQL Editor**
+3. Execute o conteúdo de `supabase/schema.sql`
+
+O schema cria automaticamente:
+- Tabelas: `profiles`, `subjects`, `topics`, `lessons`, `student_progress`, `points_history`
+- Trigger para criar perfil ao registrar usuário
+- Políticas RLS (Row Level Security)
+- Índices de performance
+
+### 4. Criar usuário admin
+
+Após criar sua conta pela plataforma, execute no SQL Editor:
+
+```sql
+update public.profiles
+set role = 'admin'
+where email = 'seu@email.com';
+```
+
+### 5. Rodar o projeto
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estrutura de pastas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── (auth)/          # Login, Register, Forgot Password
+│   ├── (dashboard)/     # Dashboard, Subjects, Topics, Lessons, Ranking
+│   ├── (admin)/         # Admin panel (CRUD)
+│   └── api/             # Route handlers
+├── components/
+│   ├── shared/          # Navbar, Sidebar, SubjectCard, TopicCard, LessonCard
+│   ├── gamification/    # XPGainToast, LevelUpModal
+│   └── ui/              # Shadcn components + custom (XPProgressBar, AnimatedButton)
+├── hooks/               # useAuth, useGamification
+├── lib/                 # Supabase clients, constants, utils
+├── services/            # auth, gamification, subjects
+└── types/               # TypeScript interfaces
+supabase/
+└── schema.sql           # Schema completo do banco
+```
 
-## Learn More
+## Gamificação
 
-To learn more about Next.js, take a look at the following resources:
+| Nível | Label      | XP mínimo |
+|-------|------------|-----------|
+| 1     | Iniciante  | 0         |
+| 2     | Explorador | 100       |
+| 3     | Aprendiz   | 250       |
+| 4     | Estudante  | 500       |
+| 5     | Dedicado   | 800       |
+| 6     | Avançado   | 1200      |
+| 7     | Expert     | 1700      |
+| 8     | Mestre     | 2300      |
+| 9     | Gênio      | 3000      |
+| 10    | Lendário   | 4000      |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Pontos por evento:**
+- +10 XP ao concluir uma aula
+- +20 XP ao completar todos os assuntos de um tópico
+- +50 XP ao completar todos os tópicos de uma matéria
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Rotas
 
-## Deploy on Vercel
+| Rota | Descrição |
+|------|-----------|
+| `/` | Landing page |
+| `/login` | Login |
+| `/register` | Cadastro |
+| `/forgot-password` | Recuperação de senha |
+| `/dashboard` | Painel do aluno |
+| `/subjects` | Lista de matérias |
+| `/subjects/[id]` | Assuntos de uma matéria |
+| `/subjects/[id]/topics/[topicId]` | Aulas de um assunto |
+| `/subjects/[id]/topics/[topicId]/lessons/[lessonId]` | Aula |
+| `/ranking` | Ranking de alunos |
+| `/admin` | Painel admin |
+| `/admin/subjects` | CRUD matérias |
+| `/admin/topics` | CRUD assuntos |
+| `/admin/lessons` | CRUD aulas |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Changelog
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### [0.1.0] - 2026-03-13
+#### Added
+- Projeto inicial com Next.js 15, React 19, TailwindCSS v4, Supabase
+- Autenticação completa (login, cadastro, recuperação de senha)
+- Dashboard do aluno com nível e XP
+- Páginas de matérias, assuntos, aulas com navegação hierárquica
+- Sistema de gamificação (10 níveis, XP, histórico de pontos)
+- Painel admin com CRUD (matérias, assuntos, aulas)
+- Ranking de alunos
+- Landing page com animações (Framer Motion)
+- Schema SQL completo com RLS, triggers e índices
+- API routes para subjects e gamificação
+- Proteção de rotas por autenticação e role (student/admin)
+
+### [0.2.0] - 2026-03-13
+#### Changed
+- Dark theme aplicado em toda a aplicação (landing, dashboard, admin, ranking, cards, navbar)
+- Fontes atualizadas: Inter (corpo) + Space Grotesk (headings) substituindo Geist
+- Cores de badges, ícones e status adaptadas para dark mode (opacity-based)
+- Scrollbar estilizada para tema escuro
+
+#### Fixed
+- Hydration error na landing page (Math.random → posições determinísticas)
+- Conflito middleware.ts / proxy.ts no Next.js 16
+- Tipos TypeScript alinhados com schema do banco (Lesson.content, StudentProgress, PointsHistory)
