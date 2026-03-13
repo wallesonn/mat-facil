@@ -132,26 +132,12 @@ export default function GridAreaCanvas() {
   const [gridCount, setGridCount] = useState(DEFAULT_GRID);
   const [cellSide, setCellSide] = useState("1");
   const [unit, setUnit] = useState<"mm" | "cm" | "m">("cm");
-  const [stats, setStats] = useState({ inside: 0, partial: 0, area: 0 });
-  const [canvasScale, setCanvasScale] = useState(1);
+  const [stats, setStats] = useState({ inside: 0, partial: 0 });
 
   const unitLabel = unit === "mm" ? "mm\u00B2" : unit === "cm" ? "cm\u00B2" : "m\u00B2";
   const sideValue = parseFloat(cellSide) || 0;
   const cellAreaReal = sideValue * sideValue;
   const realArea = parseFloat(((stats.inside + stats.partial * 0.5) * cellAreaReal).toFixed(4));
-
-  // ── Responsive scaling ──
-  useEffect(() => {
-    function handleResize() {
-      if (containerRef.current) {
-        const w = containerRef.current.clientWidth;
-        setCanvasScale(Math.min(1, w / CANVAS_SIZE));
-      }
-    }
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   // ── Get canvas-relative coords ──
   const getPos = useCallback(
@@ -229,12 +215,7 @@ export default function GridAreaCanvas() {
       }
     }
 
-    const cellArea = (1 / gridCount) * (1 / gridCount); // as fraction of total canvas
-    setStats({
-      inside,
-      partial,
-      area: parseFloat(((inside + partial * 0.5) * cellArea * 100).toFixed(1)),
-    });
+    setStats({ inside, partial });
   }, [phase, gridCount, points]);
 
   // ── Render canvas ──
@@ -344,7 +325,7 @@ export default function GridAreaCanvas() {
     setPoints([]);
     setGridCount(DEFAULT_GRID);
     setCellSide("1");
-    setStats({ inside: 0, partial: 0, area: 0 });
+    setStats({ inside: 0, partial: 0 });
   }
 
   return (
@@ -375,7 +356,7 @@ export default function GridAreaCanvas() {
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="relative bg-slate-950 rounded-2xl border border-border overflow-hidden"
+        className="relative bg-slate-950 rounded-2xl border border-border overflow-hidden w-full"
         style={{ maxWidth: CANVAS_SIZE }}
       >
         <canvas
@@ -383,10 +364,11 @@ export default function GridAreaCanvas() {
           width={CANVAS_SIZE}
           height={CANVAS_SIZE}
           style={{
-            width: CANVAS_SIZE * canvasScale,
-            height: CANVAS_SIZE * canvasScale,
+            width: "100%",
+            height: "auto",
             touchAction: "none",
             cursor: phase === "draw" ? "crosshair" : "default",
+            aspectRatio: "1 / 1",
           }}
           onMouseDown={handleStart}
           onMouseMove={handleMove}
@@ -476,14 +458,14 @@ export default function GridAreaCanvas() {
               <Ruler className="w-4 h-4 text-indigo-400" />
               <p className="text-sm font-semibold text-foreground">Tamanho do lado do quadrinho</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Input
                 type="number"
                 step="0.01"
                 min="0.01"
                 value={cellSide}
                 onChange={(e) => setCellSide(e.target.value)}
-                className="w-28 text-center font-bold"
+                className="w-24 sm:w-28 text-center font-bold"
                 placeholder="1.0"
               />
               <div className="flex rounded-lg border border-border overflow-hidden">
@@ -505,26 +487,21 @@ export default function GridAreaCanvas() {
           </div>
 
           {/* Stats panel */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
-              <div className="w-4 h-4 bg-green-500/40 rounded mx-auto mb-2 border border-green-500/50" />
-              <p className="text-2xl font-bold text-green-400">{stats.inside}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Totalmente dentro</p>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-3 sm:p-4 text-center">
+              <div className="w-4 h-4 bg-green-500/40 rounded mx-auto mb-1.5 sm:mb-2 border border-green-500/50" />
+              <p className="text-xl sm:text-2xl font-bold text-green-400">{stats.inside}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Totalmente dentro</p>
             </div>
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
-              <div className="w-4 h-4 bg-yellow-500/40 rounded mx-auto mb-2 border border-yellow-500/50" />
-              <p className="text-2xl font-bold text-yellow-400">{stats.partial}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Parcialmente dentro</p>
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-3 sm:p-4 text-center">
+              <div className="w-4 h-4 bg-yellow-500/40 rounded mx-auto mb-1.5 sm:mb-2 border border-yellow-500/50" />
+              <p className="text-xl sm:text-2xl font-bold text-yellow-400">{stats.partial}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Parcialmente dentro</p>
             </div>
-            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
-              <div className="text-lg mb-1">📐</div>
-              <p className="text-2xl font-bold text-indigo-400">≈{stats.area}%</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Área (% do canvas)</p>
-            </div>
-            <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4 text-center">
-              <div className="text-lg mb-1">📏</div>
-              <p className="text-2xl font-bold text-purple-400">≈{realArea}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Área ({unitLabel})</p>
+            <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-3 sm:p-4 text-center">
+              <div className="text-base sm:text-lg mb-1">📏</div>
+              <p className="text-xl sm:text-2xl font-bold text-purple-400">≈{realArea}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Área ({unitLabel})</p>
             </div>
           </div>
         </motion.div>
