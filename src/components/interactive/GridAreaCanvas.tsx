@@ -2,8 +2,9 @@
 
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Pencil, Grid3X3, RotateCcw, CheckCircle2, Minus, Plus } from "lucide-react";
+import { Pencil, Grid3X3, RotateCcw, CheckCircle2, Ruler } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // ─── Types ───────────────────────────────────────────────────
 interface Point {
@@ -129,8 +130,15 @@ export default function GridAreaCanvas() {
   const [points, setPoints] = useState<Point[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [gridCount, setGridCount] = useState(DEFAULT_GRID);
+  const [cellSide, setCellSide] = useState("1");
+  const [unit, setUnit] = useState<"mm" | "cm" | "m">("cm");
   const [stats, setStats] = useState({ inside: 0, partial: 0, area: 0 });
   const [canvasScale, setCanvasScale] = useState(1);
+
+  const unitLabel = unit === "mm" ? "mm\u00B2" : unit === "cm" ? "cm\u00B2" : "m\u00B2";
+  const sideValue = parseFloat(cellSide) || 0;
+  const cellAreaReal = sideValue * sideValue;
+  const realArea = parseFloat(((stats.inside + stats.partial * 0.5) * cellAreaReal).toFixed(4));
 
   // ── Responsive scaling ──
   useEffect(() => {
@@ -335,11 +343,8 @@ export default function GridAreaCanvas() {
     setPhase("draw");
     setPoints([]);
     setGridCount(DEFAULT_GRID);
+    setCellSide("1");
     setStats({ inside: 0, partial: 0, area: 0 });
-  }
-
-  function adjustGrid(delta: number) {
-    setGridCount((prev) => Math.max(MIN_GRID, Math.min(MAX_GRID, prev + delta)));
   }
 
   return (
@@ -431,59 +436,96 @@ export default function GridAreaCanvas() {
         )}
 
         {phase === "grid" && (
-          <>
-            <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={() => adjustGrid(-1)}
-                disabled={gridCount <= MIN_GRID}
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <span className="text-sm font-bold text-foreground w-16 text-center">
-                {gridCount} × {gridCount}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={() => adjustGrid(1)}
-                disabled={gridCount >= MAX_GRID}
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <Button onClick={resetAll} variant="outline" className="gap-2">
-              <RotateCcw className="w-4 h-4" />
-              Desenhar novamente
-            </Button>
-          </>
+          <Button onClick={resetAll} variant="outline" className="gap-2">
+            <RotateCcw className="w-4 h-4" />
+            Desenhar novamente
+          </Button>
         )}
       </div>
 
-      {/* Stats panel */}
+      {/* Grid controls + measurement */}
       {phase === "grid" && points.length >= 3 && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-3 gap-3"
+          className="space-y-4"
         >
-          <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
-            <div className="w-4 h-4 bg-green-500/40 rounded mx-auto mb-2 border border-green-500/50" />
-            <p className="text-2xl font-bold text-green-400">{stats.inside}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Totalmente dentro</p>
+          {/* Slider para quantidade de quadrículas */}
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-foreground">Quadrículas da malha</p>
+              <span className="text-sm font-bold text-indigo-400">{gridCount} × {gridCount}</span>
+            </div>
+            <input
+              type="range"
+              min={MIN_GRID}
+              max={MAX_GRID}
+              value={gridCount}
+              onChange={(e) => setGridCount(Number(e.target.value))}
+              className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-indigo-500"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{MIN_GRID}×{MIN_GRID}</span>
+              <span>{MAX_GRID}×{MAX_GRID}</span>
+            </div>
           </div>
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
-            <div className="w-4 h-4 bg-yellow-500/40 rounded mx-auto mb-2 border border-yellow-500/50" />
-            <p className="text-2xl font-bold text-yellow-400">{stats.partial}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Parcialmente dentro</p>
+
+          {/* Lado do quadrinho + unidade */}
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Ruler className="w-4 h-4 text-indigo-400" />
+              <p className="text-sm font-semibold text-foreground">Tamanho do lado do quadrinho</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={cellSide}
+                onChange={(e) => setCellSide(e.target.value)}
+                className="w-28 text-center font-bold"
+                placeholder="1.0"
+              />
+              <div className="flex rounded-lg border border-border overflow-hidden">
+                {(["mm", "cm", "m"] as const).map((u) => (
+                  <button
+                    key={u}
+                    onClick={() => setUnit(u)}
+                    className={`px-3 py-2 text-xs font-bold transition-colors ${
+                      unit === u
+                        ? "bg-indigo-600 text-white"
+                        : "bg-card text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
-            <div className="text-lg mb-1">📐</div>
-            <p className="text-2xl font-bold text-indigo-400">≈{stats.area}%</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Área estimada</p>
+
+          {/* Stats panel */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-center">
+              <div className="w-4 h-4 bg-green-500/40 rounded mx-auto mb-2 border border-green-500/50" />
+              <p className="text-2xl font-bold text-green-400">{stats.inside}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Totalmente dentro</p>
+            </div>
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 text-center">
+              <div className="w-4 h-4 bg-yellow-500/40 rounded mx-auto mb-2 border border-yellow-500/50" />
+              <p className="text-2xl font-bold text-yellow-400">{stats.partial}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Parcialmente dentro</p>
+            </div>
+            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 text-center">
+              <div className="text-lg mb-1">📐</div>
+              <p className="text-2xl font-bold text-indigo-400">≈{stats.area}%</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Área (% do canvas)</p>
+            </div>
+            <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4 text-center">
+              <div className="text-lg mb-1">📏</div>
+              <p className="text-2xl font-bold text-purple-400">≈{realArea}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Área ({unitLabel})</p>
+            </div>
           </div>
         </motion.div>
       )}
@@ -499,8 +541,8 @@ export default function GridAreaCanvas() {
           <p className="text-sm text-amber-200/90 font-medium mb-1">💡 Dica</p>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Quanto mais quadrículas você usar, mais precisa será a estimativa da área.
-            A fórmula é: <strong className="text-foreground">Área ≈ quadrados inteiros + (quadrados parciais × 0,5)</strong>.
-            Experimente aumentar a quantidade para ver como a estimativa muda!
+            A fórmula é: <strong className="text-foreground">Área ≈ (inteiros + parciais × 0,5) × lado²</strong>.
+            Arraste o slider para variar a malha e veja como a estimativa fica mais precisa!
           </p>
         </motion.div>
       )}
