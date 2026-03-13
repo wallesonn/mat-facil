@@ -10,6 +10,7 @@ import {
   Settings,
   ChevronRight,
   X,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { XPProgressBar } from "@/components/ui/xp-progress-bar";
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/dashboard", label: "Painel", icon: LayoutDashboard },
   { href: "/subjects",  label: "Matérias", icon: BookOpen },
   { href: "/ranking",   label: "Ranking",  icon: Trophy },
+  { href: "/profile",   label: "Meu Perfil", icon: UserCog },
 ];
 
 const adminItems = [

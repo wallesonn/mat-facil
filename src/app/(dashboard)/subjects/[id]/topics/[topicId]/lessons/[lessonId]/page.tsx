@@ -3,15 +3,22 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronRight, Construction, Zap } from "lucide-react";
+import { ArrowLeft, ChevronRight, Zap, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { getLessonById } from "@/services/subjects";
+import { getLessonById, getLessonProgress } from "@/services/subjects";
+import { completeLesson } from "@/services/gamification";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import GridAreaCanvas from "@/components/interactive/GridAreaCanvas";
 import type { Lesson } from "@/types";
 
 export default function LessonPage() {
   const { id, topicId, lessonId } = useParams<{ id: string; topicId: string; lessonId: string }>();
+  const { profile } = useAuth();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
+  const [completed, setCompleted] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     if (!lessonId) return;
@@ -19,7 +26,21 @@ export default function LessonPage() {
       setLesson(data);
       setLoading(false);
     });
-  }, [lessonId]);
+    // Check if already completed
+    if (profile?.id) {
+      getLessonProgress(profile.id, lessonId).then((progress) => {
+        if (progress?.completed) setCompleted(true);
+      });
+    }
+  }, [lessonId, profile?.id]);
+
+  async function handleComplete() {
+    if (!profile?.id || !lessonId || !topicId || completed) return;
+    setCompleting(true);
+    const result = await completeLesson(profile.id, lessonId, topicId);
+    if (result.success) setCompleted(true);
+    setCompleting(false);
+  }
 
   if (loading) {
     return (
@@ -66,49 +87,33 @@ export default function LessonPage() {
         </p>
       </div>
 
-      {/* Placeholder de conteúdo interativo */}
+      {/* Conteúdo interativo */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-indigo-500/5 border-2 border-dashed border-blue-500/20 rounded-3xl p-10 text-center"
       >
-        {/* Ícone animado */}
-        <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl shadow-blue-500/30 mb-6"
-        >
-          <Construction className="w-10 h-10 text-white" />
-        </motion.div>
-
-        <h2 className="text-2xl font-bold text-foreground mb-2 font-heading">
-          Conteúdo interativo em breve! 🚀
-        </h2>
-        <p className="text-muted-foreground max-w-md mx-auto mb-6">
-          Esta aula está sendo preparada com conteúdo interativo, exercícios e explicações passo a passo. Volte em breve!
-        </p>
-
-        {/* Features futuras */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto mb-6">
-          {[
-            { emoji: "📖", label: "Explicações passo a passo" },
-            { emoji: "✏️", label: "Exercícios interativos" },
-            { emoji: "🤖", label: "Tutor com IA" },
-          ].map((feature) => (
-            <div key={feature.label} className="bg-card rounded-2xl p-3 border border-border">
-              <div className="text-2xl mb-1">{feature.emoji}</div>
-              <p className="text-xs text-muted-foreground font-medium">{feature.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Pontuação futura */}
-        <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-full px-4 py-1.5 text-sm font-medium">
-          <Zap className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-          +10 XP ao completar esta aula
-        </div>
+        <GridAreaCanvas />
       </motion.div>
+
+      {/* Botão de conclusão */}
+      <div className="flex items-center gap-4 flex-wrap">
+        {completed ? (
+          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full px-5 py-2.5 text-sm font-semibold">
+            <CheckCircle2 className="w-4 h-4" />
+            Aula concluída! +{lesson.xp_reward} XP
+          </div>
+        ) : (
+          <Button
+            onClick={handleComplete}
+            disabled={completing}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white gap-2 px-6 py-2.5 rounded-xl"
+          >
+            <Zap className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+            {completing ? "Salvando..." : "Concluir aula e ganhar XP"}
+          </Button>
+        )}
+      </div>
 
       {/* Navegação */}
       <div className="flex justify-start">

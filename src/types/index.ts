@@ -11,10 +11,21 @@ export interface Profile {
   email: string;
   role: UserRole;
   avatar_url: string | null;
+  grade: string | null;
   points: number;
   level: number;
   created_at: string;
 }
+
+export const GRADES = [
+  "6º ano",
+  "7º ano",
+  "8º ano",
+  "9º ano",
+  "1º ano EM",
+  "2º ano EM",
+  "3º ano EM",
+] as const;
 
 // ─── Matérias ───────────────────────────────────────────────
 export interface Subject {
@@ -35,6 +46,7 @@ export interface Topic {
   title: string;
   description: string | null;
   difficulty: Difficulty;
+  grade: string | null;
   order: number;
   created_at: string;
   subject?: Subject;
@@ -115,6 +127,7 @@ export interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword: string;
+  grade: string;
 }
 
 // ─── Respostas de API ───────────────────────────────────────
@@ -146,6 +159,7 @@ export interface CreateTopicInput {
   title: string;
   description?: string;
   difficulty: Difficulty;
+  grade?: string;
   order: number;
 }
 

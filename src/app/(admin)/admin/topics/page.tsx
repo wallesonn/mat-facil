@@ -24,13 +24,15 @@ import {
 import { getSubjects, getTopicsBySubject, createTopic, updateTopic, deleteTopic } from "@/services/subjects";
 import { DIFFICULTY_CONFIG } from "@/lib/constants";
 import type { Subject, Topic, CreateTopicInput, Difficulty } from "@/types";
+import { GRADES } from "@/types";
 
-const emptyForm: CreateTopicInput = { subject_id: "", title: "", description: "", difficulty: "easy", order: 1 };
+const emptyForm: CreateTopicInput = { subject_id: "", title: "", description: "", difficulty: "easy", grade: "", order: 1 };
 
 export default function AdminTopicsPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<string>("all");
+  const [filterGrade, setFilterGrade] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Topic | null>(null);
@@ -52,7 +54,11 @@ export default function AdminTopicsPage() {
 
   useEffect(() => { loadAll(); }, []);
 
-  const filtered = selectedSubject === "all" ? topics : topics.filter((t) => t.subject_id === selectedSubject);
+  const filtered = topics.filter((t) => {
+    if (selectedSubject !== "all" && t.subject_id !== selectedSubject) return false;
+    if (filterGrade !== "all" && (t.grade ?? "") !== filterGrade) return false;
+    return true;
+  });
 
   function openCreate() {
     setEditing(null);
@@ -61,7 +67,7 @@ export default function AdminTopicsPage() {
   }
   function openEdit(t: Topic) {
     setEditing(t);
-    setForm({ subject_id: t.subject_id, title: t.title, description: t.description ?? "", difficulty: t.difficulty, order: t.order });
+    setForm({ subject_id: t.subject_id, title: t.title, description: t.description ?? "", difficulty: t.difficulty, grade: t.grade ?? "", order: t.order });
     setDialogOpen(true);
   }
 
@@ -104,7 +110,7 @@ export default function AdminTopicsPage() {
         </Button>
       </div>
 
-      {/* Filtro por matéria */}
+      {/* Filtros */}
       <div className="flex items-center gap-2 flex-wrap">
         {[{ id: "all", name: "Todas as matérias" }, ...subjects].map((s) => (
           <button
@@ -117,6 +123,20 @@ export default function AdminTopicsPage() {
             }`}
           >
             {s.name}
+          </button>
+        ))}
+        <span className="text-muted-foreground/40">|</span>
+        {[{ id: "all", label: "Todas as séries" }, ...GRADES.map((g) => ({ id: g, label: g }))].map((g) => (
+          <button
+            key={g.id}
+            onClick={() => setFilterGrade(g.id)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              filterGrade === g.id
+                ? "bg-indigo-600 text-white"
+                : "bg-card border border-border text-muted-foreground hover:border-indigo-500/30 hover:text-indigo-400"
+            }`}
+          >
+            {g.label}
           </button>
         ))}
       </div>
@@ -152,6 +172,7 @@ export default function AdminTopicsPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-semibold text-foreground text-sm">{topic.title}</p>
                       <Badge variant="outline" className={`text-xs ${diff.color}`}>{diff.label}</Badge>
+                      {topic.grade && <Badge variant="outline" className="text-xs bg-indigo-500/10 text-indigo-400 border-indigo-500/20">{topic.grade}</Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {topic.subject?.name ?? "—"}
@@ -195,6 +216,15 @@ export default function AdminTopicsPage() {
             <div className="space-y-1.5">
               <Label htmlFor="tdesc">Descrição</Label>
               <Input id="tdesc" placeholder="Breve descrição" value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Série</Label>
+              <Select value={form.grade ?? ""} onValueChange={(v) => setForm({ ...form, grade: v || "" })}>
+                <SelectTrigger><SelectValue placeholder="Selecione a série" /></SelectTrigger>
+                <SelectContent>
+                  {GRADES.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">

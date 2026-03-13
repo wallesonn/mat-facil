@@ -39,7 +39,7 @@ export async function signUp(data: RegisterFormData): Promise<ApiResponse<null>>
     email: data.email,
     password: data.password,
     options: {
-      data: { name: data.name },
+      data: { name: data.name, grade: data.grade },
     },
   });
 
@@ -53,6 +53,7 @@ export async function signUp(data: RegisterFormData): Promise<ApiResponse<null>>
       id: authData.user.id,
       name: data.name,
       email: data.email,
+      grade: data.grade || null,
       role: "student",
       points: 0,
       level: 1,
@@ -113,7 +114,7 @@ export async function getCurrentProfile(): Promise<Profile | null> {
  */
 export async function updateProfile(
   userId: string,
-  updates: Partial<Pick<Profile, "name" | "avatar_url">>
+  updates: Partial<Pick<Profile, "name" | "avatar_url" | "grade">>
 ): Promise<ApiResponse<Profile>> {
   const supabase = createClient();
 

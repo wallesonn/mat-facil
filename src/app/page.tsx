@@ -14,7 +14,7 @@ const features = [
   { icon: Trophy,   title: "Gamificação",             desc: "Ganhe XP, suba de nível e acompanhe seu progresso", color: "bg-purple-500/10 text-purple-400" },
   { icon: Brain,    title: "IA Tutora",               desc: "Em breve: tutor inteligente para tirar dúvidas", color: "bg-green-500/10 text-green-400" },
   { icon: BarChart3,title: "Acompanhamento",          desc: "Veja seu progresso e evolução em cada matéria", color: "bg-orange-500/10 text-orange-400" },
-  { icon: Users,    title: "Para o SESI",             desc: "Plataforma desenvolvida especialmente para alunos SESI", color: "bg-pink-500/10 text-pink-400" },
+  { icon: Users,    title: "Para alunos do SESI",     desc: "Plataforma destinada a alunos que estudam no SESI", color: "bg-pink-500/10 text-pink-400" },
 ];
 
 const levels = [
@@ -86,7 +86,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium text-white/90 mb-6"
           >
             <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-            Plataforma oficial SESI de aprendizado de matemática
+            Plataforma de matemática para alunos do SESI
           </motion.div>
 
           {/* Título principal */}
@@ -309,7 +309,7 @@ export default function LandingPage() {
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer className="bg-slate-900 text-white/40 py-8 text-center text-sm">
-        <p>© 2026 {APP_META.name} · Desenvolvido para o SESI</p>
+        <p>© 2026 {APP_META.name} · Destinado a alunos do SESI</p>
       </footer>
     </div>
   );

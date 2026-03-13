@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, BookOpen, BookMarked, FileText, LayoutDashboard, ChevronRight } from "lucide-react";
+import { Settings, BookOpen, BookMarked, FileText, LayoutDashboard, ChevronRight, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navbar } from "@/components/shared/Navbar";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ const adminNav = [
   { href: "/admin/subjects", label: "Matérias",     icon: BookOpen },
   { href: "/admin/topics",   label: "Assuntos",     icon: BookMarked },
   { href: "/admin/lessons",  label: "Aulas",        icon: FileText },
+  { href: "/admin/students", label: "Alunos",       icon: Users },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

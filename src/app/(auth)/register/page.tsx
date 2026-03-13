@@ -4,16 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, User, Loader2, UserPlus } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Loader2, UserPlus, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signUp } from "@/services/auth";
+import { GRADES } from "@/types";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", grade: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -84,6 +85,25 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {field("name", "Nome completo", "text", "Seu nome", <User className="w-4 h-4" />)}
           {field("email", "Email", "email", "seu@email.com", <Mail className="w-4 h-4" />)}
+
+          {/* Série */}
+          <div className="space-y-1.5">
+            <Label htmlFor="grade" className="text-white/80 text-sm font-medium">Série</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40"><GraduationCap className="w-4 h-4" /></span>
+              <select
+                id="grade"
+                value={form.grade}
+                onChange={(e) => setForm({ ...form, grade: e.target.value })}
+                required
+                className="w-full h-10 pl-10 pr-3 bg-white/10 border border-white/20 text-white rounded-md text-sm focus:border-blue-400 focus:outline-none appearance-none cursor-pointer [&>option]:bg-slate-900 [&>option]:text-white"
+              >
+                <option value="" disabled>Selecione sua série</option>
+                {GRADES.map((g) => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
+          </div>
+
           {field("password", "Senha", "password", "Mínimo 6 caracteres", <Lock className="w-4 h-4" />)}
           {field("confirmPassword", "Confirmar senha", "password", "Repita a senha", <Lock className="w-4 h-4" />)}
 
