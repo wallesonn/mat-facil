@@ -21,6 +21,11 @@ Plataforma de aprendizado de matemática para alunos do SESI. Aprenda de forma d
 - ✅ Painel admin com CRUD completo (matérias, assuntos, aulas)
 - ✅ Ranking de alunos
 - ✅ Proteção de rotas por autenticação e role
+- ✅ Campo série no cadastro (6º ano a 3º ano EM)
+- ✅ Página de perfil do aluno
+- ✅ Página admin de alunos (filtro por série)
+- ✅ Conteúdo interativo (canvas de cálculo de área)
+- ✅ Deploy via Docker Hub + Portainer + Traefik
 - 🔜 Exercícios interativos
 - 🔜 Tutor com IA
 - 🔜 Badges e conquistas
@@ -78,6 +83,20 @@ npm run dev
 ```
 
 Acesse: [http://localhost:3000](http://localhost:3000)
+
+## Deploy (Produção)
+
+**URL**: [https://matfacil.site](https://matfacil.site)
+
+```bash
+# Build e push para Docker Hub
+./build.sh v1.0.0
+
+# No Portainer da VPS: criar stack com mat-facil-docker/docker-compose.yml
+# Variáveis: IMAGE_TAG=latest, DOMAIN=matfacil.site
+```
+
+Veja instruções completas em [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ## Estrutura de pastas
 
@@ -138,6 +157,8 @@ supabase/
 | `/admin/subjects` | CRUD matérias |
 | `/admin/topics` | CRUD assuntos |
 | `/admin/lessons` | CRUD aulas |
+| `/admin/students` | Lista de alunos |
+| `/profile` | Edição de perfil |
 
 ## Changelog
 
@@ -155,14 +176,26 @@ supabase/
 - API routes para subjects e gamificação
 - Proteção de rotas por autenticação e role (student/admin)
 
+### [0.3.1] - 2026-03-14
+#### Added
+- Deploy em produção: [matfacil.site](https://matfacil.site)
+- Script `build.sh` para build e push no Docker Hub (`wallesonnn/mat-facil`)
+- Variável `IMAGE_TAG` no docker-compose
+- Rede Docker corrigida para `web` (compatível com Traefik existente)
+
+### [0.3.0] - 2026-03-13
+#### Added
+- Campo série no cadastro e perfil do aluno
+- Página de perfil (`/profile`)
+- Página admin de alunos (`/admin/students`) com filtro por série
+- Canvas interativo para cálculo de área com quadrícula
+- Dockerfile, Docker Compose, documentação completa (`docs/`)
+
 ### [0.2.0] - 2026-03-13
 #### Changed
-- Dark theme aplicado em toda a aplicação (landing, dashboard, admin, ranking, cards, navbar)
-- Fontes atualizadas: Inter (corpo) + Space Grotesk (headings) substituindo Geist
-- Cores de badges, ícones e status adaptadas para dark mode (opacity-based)
-- Scrollbar estilizada para tema escuro
+- Dark theme aplicado em toda a aplicação
+- Fontes atualizadas: Inter + Space Grotesk
 
 #### Fixed
-- Hydration error na landing page (Math.random → posições determinísticas)
+- Hydration error na landing page
 - Conflito middleware.ts / proxy.ts no Next.js 16
-- Tipos TypeScript alinhados com schema do banco (Lesson.content, StudentProgress, PointsHistory)

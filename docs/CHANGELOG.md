@@ -2,17 +2,23 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
-## [0.3.1] - 2026-03-13
+## [0.3.1] - 2026-03-14
 
 ### Added
+- Deploy em produção: [matfacil.site](https://matfacil.site)
 - Script `build.sh` para build e push de imagem Docker para Docker Hub (`wallesonnn/mat-facil`)
+- Arquivo `.env.build.example` para variáveis de build
 - Variável `IMAGE_TAG` no docker-compose para controle de versão da imagem
 - Domínio `matfacil.site` configurado em todos os arquivos
 - Guia de configuração DNS na Hostinger
 
 ### Changed
 - Docker Compose agora puxa imagem do Docker Hub (não faz build local na VPS)
+- Rede Docker corrigida de `traefik` para `web` (compatível com Traefik existente na VPS)
 - Documentação de deploy reescrita para fluxo Docker Hub + Portainer
+
+### Fixed
+- `build.sh`: corrigido parsing de variáveis com espaço (`MAT Fácil`) usando `source` em vez de `export+xargs`
 
 ## [0.3.0] - 2026-03-13
 
