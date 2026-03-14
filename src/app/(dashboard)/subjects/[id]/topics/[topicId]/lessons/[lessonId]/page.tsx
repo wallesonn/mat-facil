@@ -10,6 +10,7 @@ import { completeLesson } from "@/services/gamification";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import GridAreaCanvas from "@/components/interactive/GridAreaCanvas";
+import QuizAreaGame from "@/components/interactive/QuizAreaGame";
 import type { Lesson } from "@/types";
 
 export default function LessonPage() {
@@ -19,6 +20,7 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [quizXP, setQuizXP] = useState<number | null>(null);
 
   useEffect(() => {
     if (!lessonId) return;
@@ -40,6 +42,13 @@ export default function LessonPage() {
     const result = await completeLesson(profile.id, lessonId, topicId);
     if (result.success) setCompleted(true);
     setCompleting(false);
+  }
+
+  function handleQuizComplete(score: number, totalXP: number) {
+    setQuizXP(totalXP);
+    if (!completed && profile?.id && lessonId && topicId) {
+      handleComplete();
+    }
   }
 
   if (loading) {
@@ -96,22 +105,22 @@ export default function LessonPage() {
         <GridAreaCanvas />
       </motion.div>
 
-      {/* Botão de conclusão */}
+      {/* Quiz */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <QuizAreaGame onComplete={handleQuizComplete} />
+      </motion.div>
+
+      {/* Status de conclusão */}
       <div className="flex items-center gap-4 flex-wrap">
-        {completed ? (
+        {completed && (
           <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full px-5 py-2.5 text-sm font-semibold">
             <CheckCircle2 className="w-4 h-4" />
             Aula concluída! +{lesson.xp_reward} XP
           </div>
-        ) : (
-          <Button
-            onClick={handleComplete}
-            disabled={completing}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white gap-2 px-6 py-2.5 rounded-xl"
-          >
-            <Zap className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            {completing ? "Salvando..." : "Concluir aula e ganhar XP"}
-          </Button>
         )}
       </div>
 
