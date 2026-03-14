@@ -7,7 +7,9 @@ set -e
 VERSION=${1:-v1.0.0}
 
 if [ -f .env.build ]; then
-  export $(grep -v '^#' .env.build | xargs)
+  set -a
+  source .env.build
+  set +a
 else
   echo "❌ Arquivo .env.build não encontrado."
   echo "   Copie .env.build.example para .env.build e preencha os valores."
