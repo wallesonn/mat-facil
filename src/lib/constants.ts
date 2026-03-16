@@ -21,6 +21,7 @@ export const POINTS = {
   COMPLETE_LESSON: 10,
   COMPLETE_TOPIC: 20,
   COMPLETE_SUBJECT: 50,
+  QUIZ_PER_QUESTION: 2,
 } as const;
 
 // ─── Razões de pontuação (salvo no points_history) ──────────
@@ -28,6 +29,7 @@ export const POINT_REASONS = {
   COMPLETE_LESSON: "Aula concluída",
   COMPLETE_TOPIC: "Assunto concluído (bônus)",
   COMPLETE_SUBJECT: "Matéria concluída (bônus)",
+  QUIZ_COMPLETION: "Quiz concluído",
 } as const;
 
 // ─── Cores por dificuldade ────────────────────────────────────

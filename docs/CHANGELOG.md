@@ -2,6 +2,40 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
+## [0.3.2] - 2026-03-16
+
+### Added
+- Quiz interativo estilo Duolingo na página da aula (`QuizAreaGame`)
+  - Banco de 15 perguntas sobre área com quadrícula (6 fáceis, 6 médias, 3 difíceis)
+  - Sorteio de 5 perguntas por sessão (2 fáceis + 2 médias + 1 difícil)
+  - Timer por pergunta (15s fácil, 12s médio, 10s difícil)
+  - Animações de acerto/erro, confetti e tela de resultado com estrelas
+  - Sons via Web Audio API (acerto, erro, conclusão, tick)
+  - Progress bar e badge de dificuldade
+  - 2 XP por acerto (máx 10 XP por sessão)
+  - Conclusão automática da aula ao terminar o quiz
+- Persistência de resultados do quiz (`quiz_results` no Supabase)
+  - Estrelas e XP salvos por aula/aluno
+  - XP incremental: só ganha XP adicional ao superar recorde de estrelas
+  - Tela de resultado exibe estrelas anteriores e XP ganho
+- Filtro de tópicos por série do aluno
+  - Aluno vê apenas tópicos da sua série ou sem série definida
+  - Sem filtro para admin ou aluno sem série
+- Suporte a `www.matfacil.site`: router Traefik + certificado SSL + redirect 301 para `matfacil.site`
+
+### Changed
+- Fórmula padronizada para `inteiros + parciais/2` em todo o projeto (canvas e quiz)
+- Perguntas `e3`, `e4`, `e5` do quiz agora incluem quadradinhos parciais (amarelos) no grid visual
+
+### Fixed
+- `docker-compose.yml`: `certresolver` corrigido de `letsencrypt` para `lets-encrypt` (com hífen)
+- Acesso pelo celular: site inacessível via `www` por falta de rota e certificado SSL
+- Quiz: stale closure no `score` final — último acerto não era contabilizado no resultado
+- Quiz: travamento ao navegar após concluir (`handleQuizComplete` chamava `handleComplete` repetidamente)
+- Performance crítica: `createClient()` criava nova instância Supabase a cada chamada — corrigido com padrão singleton
+- Performance crítica: `useAuth` era hook independente (cada componente criava seu próprio listener) — convertido para React Context Provider (`AuthProvider`) com instância única no root layout
+- Tempos de resposta reduzidos de 25-75s para ~500ms após os dois fixes acima
+
 ## [0.3.1] - 2026-03-14
 
 ### Added

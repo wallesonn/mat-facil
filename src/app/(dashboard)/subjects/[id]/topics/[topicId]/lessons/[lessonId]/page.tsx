@@ -46,7 +46,7 @@ export default function LessonPage() {
 
   function handleQuizComplete(score: number, totalXP: number) {
     setQuizXP(totalXP);
-    if (!completed && profile?.id && lessonId && topicId) {
+    if (!completed && !completing && profile?.id && lessonId && topicId) {
       handleComplete();
     }
   }
@@ -111,7 +111,7 @@ export default function LessonPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <QuizAreaGame onComplete={handleQuizComplete} />
+        <QuizAreaGame userId={profile?.id} lessonId={lessonId} onComplete={handleQuizComplete} />
       </motion.div>
 
       {/* Status de conclusão */}

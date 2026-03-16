@@ -7,22 +7,24 @@ import { BookOpen, ArrowLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { TopicCard } from "@/components/shared/TopicCard";
 import { getSubjectById, getTopicsBySubject } from "@/services/subjects";
+import { useAuth } from "@/hooks/useAuth";
 import type { Subject, Topic } from "@/types";
 
 export default function SubjectPage() {
   const { id } = useParams<{ id: string }>();
+  const { profile } = useAuth();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
-    Promise.all([getSubjectById(id), getTopicsBySubject(id)]).then(([sub, tops]) => {
+    if (!id || profile === undefined) return;
+    Promise.all([getSubjectById(id), getTopicsBySubject(id, profile?.grade)]).then(([sub, tops]) => {
       setSubject(sub);
       setTopics(tops);
       setLoading(false);
     });
-  }, [id]);
+  }, [id, profile]);
 
   if (loading) {
     return (

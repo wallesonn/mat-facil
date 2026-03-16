@@ -1,14 +1,27 @@
 "use client";
 
 // ============================================================
-// HOOK DE AUTENTICAÇÃO — estado global do usuário
+// HOOK DE AUTENTICAÇÃO — Context Provider (singleton)
+// Garante UMA ÚNICA instância de listener e estado para toda a app
 // ============================================================
 
-import { useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, createElement, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/types";
 
-export function useAuth() {
+interface AuthContextValue {
+  profile: Profile | null;
+  loading: boolean;
+  refetch: () => void;
+}
+
+const AuthContext = createContext<AuthContextValue>({
+  profile: null,
+  loading: true,
+  refetch: () => {},
+});
+
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -44,5 +57,13 @@ export function useAuth() {
     return () => listener.subscription.unsubscribe();
   }, [fetchProfile]);
 
-  return { profile, loading, refetch: () => profile && fetchProfile(profile.id) };
+  const refetch = useCallback(() => {
+    if (profile) fetchProfile(profile.id);
+  }, [profile, fetchProfile]);
+
+  return createElement(AuthContext.Provider, { value: { profile, loading, refetch } }, children);
+}
+
+export function useAuth(): AuthContextValue {
+  return useContext(AuthContext);
 }

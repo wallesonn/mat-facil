@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import AuthProviderWrapper from "@/components/providers/AuthProviderWrapper";
 import "./globals.css";
 
 const inter = Inter({
@@ -26,8 +27,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="dark">
       <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
-        {children}
-        <Toaster richColors position="top-right" />
+        <AuthProviderWrapper>
+          {children}
+          <Toaster richColors position="top-right" />
+        </AuthProviderWrapper>
       </body>
     </html>
   );

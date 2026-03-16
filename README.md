@@ -25,6 +25,8 @@ Plataforma de aprendizado de matemática para alunos do SESI. Aprenda de forma d
 - ✅ Página de perfil do aluno
 - ✅ Página admin de alunos (filtro por série)
 - ✅ Conteúdo interativo (canvas de cálculo de área)
+- ✅ Quiz interativo estilo Duolingo (estrelas, XP incremental, persistência)
+- ✅ Filtro de tópicos por série do aluno
 - ✅ Deploy via Docker Hub + Portainer + Traefik
 - 🔜 Exercícios interativos
 - 🔜 Tutor com IA
@@ -61,7 +63,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 3. Execute o conteúdo de `supabase/schema.sql`
 
 O schema cria automaticamente:
-- Tabelas: `profiles`, `subjects`, `topics`, `lessons`, `student_progress`, `points_history`
+- Tabelas: `profiles`, `subjects`, `topics`, `lessons`, `student_progress`, `points_history`, `quiz_results`
 - Trigger para criar perfil ao registrar usuário
 - Políticas RLS (Row Level Security)
 - Índices de performance
@@ -111,9 +113,9 @@ src/
 │   ├── shared/          # Navbar, Sidebar, SubjectCard, TopicCard, LessonCard
 │   ├── gamification/    # XPGainToast, LevelUpModal
 │   └── ui/              # Shadcn components + custom (XPProgressBar, AnimatedButton)
-├── hooks/               # useAuth, useGamification
-├── lib/                 # Supabase clients, constants, utils
-├── services/            # auth, gamification, subjects
+├── hooks/               # useAuth (Context Provider singleton)
+├── lib/                 # Supabase clients (singleton), constants, utils
+├── services/            # auth, gamification, subjects, quiz
 └── types/               # TypeScript interfaces
 supabase/
 └── schema.sql           # Schema completo do banco
@@ -136,6 +138,7 @@ supabase/
 
 **Pontos por evento:**
 - +10 XP ao concluir uma aula
+- +2 XP por acerto no quiz (máx 10 XP, só ganha adicional ao superar recorde de estrelas)
 - +20 XP ao completar todos os assuntos de um tópico
 - +50 XP ao completar todos os tópicos de uma matéria
 
@@ -175,6 +178,16 @@ supabase/
 - Schema SQL completo com RLS, triggers e índices
 - API routes para subjects e gamificação
 - Proteção de rotas por autenticação e role (student/admin)
+
+### [0.3.2] - 2026-03-16
+#### Added
+- Quiz interativo com persistência de estrelas e XP incremental
+- Filtro de tópicos por série do aluno
+- Tabela `quiz_results` no Supabase
+
+#### Fixed
+- Performance: Supabase client singleton + `useAuth` como Context Provider (~500ms vs 75s)
+- Quiz: stale closure no score e travamento ao navegar
 
 ### [0.3.1] - 2026-03-14
 #### Added

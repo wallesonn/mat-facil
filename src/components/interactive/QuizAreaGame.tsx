@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Timer, Trophy, Zap, X, Star, CheckCircle2, XCircle, ArrowRight, Sparkles } from "lucide-react";
 import { pickQuizQuestions, type QuizQuestion } from "@/data/areaQuizQuestions";
 import { playCorrect, playWrong, playComplete, playTick, playStart } from "@/lib/sounds";
+import { getQuizResult, saveQuizResult } from "@/services/quiz";
+import { POINTS } from "@/lib/constants";
 
-const XP_PER_QUESTION = 2;
+const XP_PER_QUESTION = POINTS.QUIZ_PER_QUESTION;
 const TOTAL_QUESTIONS = 5;
 
 // ─── Grid SVG ───────────────────────────────────────────────
@@ -114,12 +116,14 @@ function Confetti() {
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 interface QuizAreaGameProps {
+  userId?: string;
+  lessonId?: string;
   onComplete: (score: number, totalXP: number) => void;
 }
 
 type Phase = "intro" | "playing" | "feedback" | "results";
 
-export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
+export default function QuizAreaGame({ userId, lessonId, onComplete }: QuizAreaGameProps) {
   const [phase, setPhase] = useState<Phase>("intro");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [current, setCurrent] = useState(0);
@@ -128,8 +132,20 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [previousStars, setPreviousStars] = useState(0);
+  const [xpAwarded, setXpAwarded] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasTickedRef = useRef(false);
+  const scoreRef = useRef(0);
+
+  // Load previous quiz result
+  useEffect(() => {
+    if (!userId || !lessonId) return;
+    getQuizResult(userId, lessonId).then((result) => {
+      if (result) setPreviousStars(result.stars);
+    });
+  }, [userId, lessonId]);
 
   // Start quiz
   const startQuiz = useCallback(() => {
@@ -137,6 +153,7 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
     setQuestions(picked);
     setCurrent(0);
     setScore(0);
+    scoreRef.current = 0;
     setSelected(null);
     setIsCorrect(null);
     setTimeLeft(picked[0].timeLimit);
@@ -179,7 +196,8 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
     setIsCorrect(correct);
 
     if (correct) {
-      setScore((s) => s + 1);
+      scoreRef.current += 1;
+      setScore(scoreRef.current);
       playCorrect();
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 1200);
@@ -191,13 +209,27 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
   }
 
   // Next question or results
-  function handleNext() {
+  async function handleNext() {
     const nextIdx = current + 1;
     if (nextIdx >= TOTAL_QUESTIONS) {
-      const finalScore = score;
+      const finalScore = scoreRef.current;
+      const finalStars = finalScore >= 5 ? 3 : finalScore >= 3 ? 2 : finalScore >= 1 ? 1 : 0;
       playComplete();
       setPhase("results");
-      onComplete(finalScore, finalScore * XP_PER_QUESTION);
+
+      // Save result and get incremental XP
+      if (userId && lessonId) {
+        setSaving(true);
+        const result = await saveQuizResult(
+          userId, lessonId, finalScore, TOTAL_QUESTIONS, finalStars, XP_PER_QUESTION
+        );
+        setXpAwarded(result.xpAwarded);
+        setPreviousStars(Math.max(previousStars, finalStars));
+        setSaving(false);
+        onComplete(finalScore, result.xpAwarded);
+      } else {
+        onComplete(finalScore, finalScore * XP_PER_QUESTION);
+      }
     } else {
       setCurrent(nextIdx);
       setSelected(null);
@@ -230,9 +262,23 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
           <Sparkles className="w-8 h-8 text-white" />
         </div>
         <h3 className="text-xl font-bold font-heading text-foreground">Quiz: Área com Quadrícula</h3>
+
+        {previousStars > 0 && (
+          <div className="flex items-center justify-center gap-1">
+            {[1, 2, 3].map((s) => (
+              <Star
+                key={s}
+                className={`w-5 h-5 ${s <= previousStars ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground/30"}`}
+              />
+            ))}
+            <span className="text-xs text-muted-foreground ml-1">Seu melhor resultado</span>
+          </div>
+        )}
+
         <p className="text-muted-foreground text-sm max-w-md mx-auto">
           Responda 5 perguntas sobre cálculo de área usando o método da quadrícula.
           Cada resposta certa vale <strong className="text-yellow-400">{XP_PER_QUESTION} XP</strong>!
+          {previousStars > 0 && " Conquiste mais estrelas para ganhar XP extra!"}
         </p>
         <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1"><Timer className="w-3.5 h-3.5" /> Tempo limitado</span>
@@ -256,11 +302,11 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
 
   // ─── RESULTS ──────────────────────────────────────────────
   if (phase === "results") {
-    const totalXP = score * XP_PER_QUESTION;
     const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
     const stars = score >= 5 ? 3 : score >= 3 ? 2 : score >= 1 ? 1 : 0;
     const emoji = score === 5 ? "🏆" : score >= 3 ? "🎉" : score >= 1 ? "👍" : "😢";
     const msg = score === 5 ? "Perfeito!" : score >= 3 ? "Muito bem!" : score >= 1 ? "Continue praticando!" : "Tente novamente!";
+    const displayXP = xpAwarded !== null ? xpAwarded : score * XP_PER_QUESTION;
 
     return (
       <motion.div
@@ -297,7 +343,9 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
           </div>
           <div className="w-px h-10 bg-border" />
           <div className="text-center">
-            <div className="text-3xl font-bold text-yellow-400">+{totalXP}</div>
+            <div className="text-3xl font-bold text-yellow-400">
+              {saving ? "..." : `+${displayXP}`}
+            </div>
             <div className="text-xs text-muted-foreground">XP ganhos</div>
           </div>
           <div className="w-px h-10 bg-border" />
@@ -307,10 +355,17 @@ export default function QuizAreaGame({ onComplete }: QuizAreaGameProps) {
           </div>
         </div>
 
+        {xpAwarded !== null && xpAwarded === 0 && stars <= previousStars && (
+          <p className="text-xs text-muted-foreground">
+            Você já conquistou {previousStars} estrela{previousStars !== 1 ? "s" : ""} neste quiz. Conquiste mais para ganhar XP!
+          </p>
+        )}
+
         <button
           onClick={() => {
             setPhase("intro");
             setShowConfetti(false);
+            setXpAwarded(null);
           }}
           className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all active:scale-95"
         >
