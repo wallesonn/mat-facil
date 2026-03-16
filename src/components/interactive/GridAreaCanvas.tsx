@@ -518,7 +518,7 @@ export default function GridAreaCanvas() {
           <p className="text-sm text-amber-200/90 font-medium mb-1">💡 Dica</p>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Quanto mais quadrículas você usar, mais precisa será a estimativa da área.
-            A fórmula é: <strong className="text-foreground">Área ≈ (inteiros + parciais × 0,5) × lado²</strong>.
+            A fórmula é: <strong className="text-foreground">Área ≈ (inteiros + parciais/2) × lado²</strong>.
             Arraste o slider para variar a malha e veja como a estimativa fica mais precisa!
           </p>
         </motion.div>
