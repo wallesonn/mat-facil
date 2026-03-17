@@ -2,6 +2,33 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
+## [0.4.0] - 2026-03-16
+
+### Added
+- Tópicos agrupados por série na página de assuntos
+  - Cada grupo exibe o nome da série como cabeçalho
+  - Badge "Sua série" destaca a série do aluno logado
+- Sistema de desbloqueio progressivo de conteúdo interativo
+  - Série do aluno desbloqueada automaticamente se não há tópicos/aulas da série anterior na mesma matéria
+  - Requer 3★ em todos os quizzes das aulas dos tópicos da série anterior (mesma matéria) para desbloquear
+  - Tópicos de séries anteriores sempre acessíveis (para o aluno poder fazer os quizzes e desbloquear sua série)
+  - Tópicos de séries posteriores sempre bloqueados
+  - Admin vê tudo desbloqueado
+- Estrelas do quiz exibidas ao lado do nome da aula na lista de aulas
+- Auto-promoção de série na virada do ano letivo
+  - Função SQL `promote_student_grades()` avança todos os alunos para a próxima série
+  - Agendada via `pg_cron` para 1º de fevereiro às 00:00 BRT
+  - Arquivo: `supabase/migrations/promote_grades.sql`
+
+### Changed
+- Tópicos: todos visíveis para todos os alunos (removido filtro por série — substituído pelo sistema de desbloqueio)
+- `TopicCard`: novo visual para estado bloqueado (cadeado, opacidade reduzida, mensagem de requisito)
+
+### Fixed
+- Trigger `handle_new_user`: série (`grade`) não era salva no perfil ao cadastrar — corrigido lendo `raw_user_meta_data->>'grade'`
+- `getLessonProgress`: erro 406 (Not Acceptable) ao abrir aula sem progresso anterior — corrigido usando `.maybeSingle()` em vez de `.single()`
+- Lógica de desbloqueio: tópicos de séries anteriores estavam bloqueados, impedindo o aluno de fazer os quizzes necessários para desbloquear sua própria série
+
 ## [0.3.2] - 2026-03-16
 
 ### Added

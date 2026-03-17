@@ -139,6 +139,16 @@ export async function completeLesson(
 ): Promise<{ success: boolean; leveledUp: boolean; bonusEarned: boolean }> {
   const supabase = createClient();
 
+  // Verifica se a aula já foi concluída antes de dar XP (idempotência)
+  const { data: existing } = await supabase
+    .from("student_progress")
+    .select("completed")
+    .eq("user_id", userId)
+    .eq("lesson_id", lessonId)
+    .maybeSingle();
+
+  const wasAlreadyCompleted = existing?.completed === true;
+
   // Registra ou atualiza o progresso
   await supabase
     .from("student_progress")
@@ -146,14 +156,17 @@ export async function completeLesson(
       {
         user_id: userId,
         lesson_id: lessonId,
-        progress_percentage: 100,
         completed: true,
-        last_access: new Date().toISOString(),
+        completed_at: new Date().toISOString(),
       },
       { onConflict: "user_id,lesson_id" }
     );
 
-  // Adiciona pontos pela aula
+  // Só adiciona pontos se a aula não havia sido concluída antes
+  if (wasAlreadyCompleted) {
+    return { success: true, leveledUp: false, bonusEarned: false };
+  }
+
   const result = await addPoints(userId, POINTS.COMPLETE_LESSON, POINT_REASONS.COMPLETE_LESSON);
 
   // Verifica se todas as aulas do tópico foram concluídas para bônus

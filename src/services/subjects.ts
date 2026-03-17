@@ -58,20 +58,8 @@ export async function deleteSubject(id: string): Promise<ApiResponse<null>> {
 
 // ─── Tópicos ─────────────────────────────────────────────────
 
-export async function getTopicsBySubject(subjectId: string, grade?: string | null): Promise<Topic[]> {
+export async function getTopicsBySubject(subjectId: string): Promise<Topic[]> {
   const supabase = createClient();
-
-  if (grade) {
-    // Return topics matching the student's grade OR topics with no grade (visible to all)
-    const { data } = await supabase
-      .from("topics")
-      .select("*")
-      .eq("subject_id", subjectId)
-      .or(`grade.eq.${grade},grade.is.null`)
-      .order("order");
-    return data ?? [];
-  }
-
   const { data } = await supabase
     .from("topics")
     .select("*")

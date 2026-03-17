@@ -9,22 +9,44 @@ import { Badge } from "@/components/ui/badge";
 import { LessonCard } from "@/components/shared/LessonCard";
 import { getTopicById, getLessonsByTopic } from "@/services/subjects";
 import { DIFFICULTY_CONFIG } from "@/lib/constants";
+import { useAuth } from "@/hooks/useAuth";
+import { createClient } from "@/lib/supabase/client";
 import type { Topic, Lesson } from "@/types";
 
 export default function TopicPage() {
   const { id, topicId } = useParams<{ id: string; topicId: string }>();
+  const { profile } = useAuth();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [starsMap, setStarsMap] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!topicId) return;
-    Promise.all([getTopicById(topicId), getLessonsByTopic(topicId)]).then(([t, l]) => {
+    if (!topicId || profile === undefined) return;
+
+    async function load() {
+      const [t, l] = await Promise.all([getTopicById(topicId), getLessonsByTopic(topicId)]);
       setTopic(t);
       setLessons(l);
+
+      if (profile?.id && l.length > 0) {
+        const supabase = createClient();
+        const lessonIds = l.map((lesson) => lesson.id);
+        const { data } = await supabase
+          .from("quiz_results")
+          .select("lesson_id, stars")
+          .eq("user_id", profile.id)
+          .in("lesson_id", lessonIds);
+        if (data) {
+          setStarsMap(Object.fromEntries(data.map((r) => [r.lesson_id, r.stars])));
+        }
+      }
+
       setLoading(false);
-    });
-  }, [topicId]);
+    }
+
+    load();
+  }, [topicId, profile]);
 
   if (loading) {
     return (
@@ -99,6 +121,7 @@ export default function TopicPage() {
                 subjectId={id}
                 topicId={topicId}
                 index={i}
+                stars={starsMap[lesson.id] ?? 0}
               />
             ))}
           </div>

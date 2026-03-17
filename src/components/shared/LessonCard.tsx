@@ -13,6 +13,7 @@ interface LessonCardProps {
   index?: number;
   completed?: boolean;
   progressPercentage?: number;
+  stars?: number;
 }
 
 export function LessonCard({
@@ -22,6 +23,7 @@ export function LessonCard({
   index = 0,
   completed = false,
   progressPercentage = 0,
+  stars = 0,
 }: LessonCardProps) {
   const inProgress = progressPercentage > 0 && !completed;
 
@@ -55,12 +57,21 @@ export function LessonCard({
 
           {/* Conteúdo */}
           <div className="flex-1 min-w-0">
-            <p className={cn(
-              "font-medium text-sm truncate",
-              completed ? "text-green-400" : "text-foreground group-hover:text-primary transition-colors"
-            )}>
-              {lesson.title}
-            </p>
+            <div className="flex items-center gap-2 min-w-0">
+              <p className={cn(
+                "font-medium text-sm truncate",
+                completed ? "text-green-400" : "text-foreground group-hover:text-primary transition-colors"
+              )}>
+                {lesson.title}
+              </p>
+              {stars > 0 && (
+                <span className="flex-shrink-0 flex items-center gap-0.5 text-xs text-yellow-400" aria-label={`${stars} estrelas`}>
+                  {[1, 2, 3].map((s) => (
+                    <span key={s} className={s <= stars ? "text-yellow-400" : "text-muted-foreground/30"}>★</span>
+                  ))}
+                </span>
+              )}
+            </div>
             {inProgress && (
               <div className="mt-1.5">
                 <div className="h-1 bg-blue-500/20 rounded-full overflow-hidden max-w-[100px]">

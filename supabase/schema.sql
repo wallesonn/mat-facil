@@ -143,14 +143,15 @@ create or replace trigger student_progress_updated_at
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, name, email, role, points, level)
+  insert into public.profiles (id, name, email, role, points, level, grade)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
     new.email,
     'student',
     0,
-    1
+    1,
+    new.raw_user_meta_data->>'grade'
   );
   return new;
 end;
