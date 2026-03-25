@@ -3,14 +3,19 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChevronRight, Zap, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { getLessonById, getLessonProgress } from "@/services/subjects";
 import { completeLesson } from "@/services/gamification";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
 import GridAreaCanvas from "@/components/interactive/GridAreaCanvas";
-import QuizAreaGame from "@/components/interactive/QuizAreaGame";
+import LessonInteractiveCanvas from "@/components/interactive/LessonInteractiveCanvas";
+import LessonQuizGame from "@/components/interactive/LessonQuizGame";
+import { getInteractiveDefinitionForLesson } from "@/data/lessonInteractions";
+import {
+  getQuizDefinitionForLesson,
+  shouldShowGridCanvasForLesson,
+} from "@/data/lessonQuizzes";
 import type { Lesson } from "@/types";
 
 export default function LessonPage() {
@@ -44,7 +49,7 @@ export default function LessonPage() {
     setCompleting(false);
   }
 
-  function handleQuizComplete(score: number, totalXP: number) {
+  function handleQuizComplete(_score: number, totalXP: number) {
     setQuizXP(totalXP);
     if (!completed && !completing && profile?.id && lessonId && topicId) {
       handleComplete();
@@ -70,6 +75,10 @@ export default function LessonPage() {
       </div>
     );
   }
+
+  const quiz = getQuizDefinitionForLesson(lesson);
+  const interactive = getInteractiveDefinitionForLesson(lesson);
+  const showGridCanvas = shouldShowGridCanvasForLesson(lesson);
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -97,25 +106,54 @@ export default function LessonPage() {
       </div>
 
       {/* Conteúdo interativo */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <GridAreaCanvas />
-      </motion.div>
+      {showGridCanvas && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <GridAreaCanvas />
+        </motion.div>
+      )}
+
+      {interactive && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <LessonInteractiveCanvas definition={interactive} />
+        </motion.div>
+      )}
 
       {/* Quiz */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <QuizAreaGame userId={profile?.id} lessonId={lessonId} onComplete={handleQuizComplete} />
-      </motion.div>
+      {quiz ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <LessonQuizGame
+            quiz={quiz}
+            userId={profile?.id}
+            lessonId={lessonId}
+            onComplete={handleQuizComplete}
+          />
+        </motion.div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border bg-card/60 p-6 text-sm text-muted-foreground">
+          Quiz ainda não configurado para esta aula.
+        </div>
+      )}
 
       {/* Status de conclusão */}
       <div className="flex items-center gap-4 flex-wrap">
+        {quizXP !== null && (
+          <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-full px-5 py-2.5 text-sm font-semibold">
+            <CheckCircle2 className="w-4 h-4" />
+            Quiz concluído! +{quizXP} XP
+          </div>
+        )}
         {completed && (
           <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full px-5 py-2.5 text-sm font-semibold">
             <CheckCircle2 className="w-4 h-4" />

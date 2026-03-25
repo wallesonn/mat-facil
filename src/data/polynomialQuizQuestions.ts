@@ -1,0 +1,208 @@
+import type { QuizQuestion } from "@/data/areaQuizQuestions";
+
+export const SOMA_POLINOMIOS_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "sp-e1",
+    difficulty: "easy",
+    type: "true_false",
+    question: "(2x + 3x) = 5x.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Somamos os coeficientes dos termos semelhantes: 2x + 3x = 5x.",
+    timeLimit: 15,
+  },
+  {
+    id: "sp-e2",
+    difficulty: "easy",
+    type: "multiple_choice",
+    question: "Quanto vale (-4a + 6a)?",
+    options: [
+      { text: "-10a", correct: false },
+      { text: "2a", correct: true },
+      { text: "10a", correct: false },
+      { text: "-2a", correct: false },
+    ],
+    explanation: "-4a + 6a = 2a.",
+    timeLimit: 15,
+  },
+  {
+    id: "sp-m1",
+    difficulty: "medium",
+    type: "multiple_choice",
+    question: "Se P(x) = 3x² + 2x - 1 e Q(x) = x² - 5x + 4, então P(x) + Q(x) é:",
+    options: [
+      { text: "4x² - 3x + 3", correct: true },
+      { text: "2x² + 7x + 3", correct: false },
+      { text: "4x² + 7x + 5", correct: false },
+      { text: "3x² - 3x + 3", correct: false },
+    ],
+    explanation: "Somamos os coeficientes dos termos semelhantes: 3x² + x² = 4x², 2x - 5x = -3x, -1 + 4 = 3.",
+    timeLimit: 12,
+  },
+  {
+    id: "sp-m2",
+    difficulty: "medium",
+    type: "true_false",
+    question: "Na soma de polinômios, os termos de mesmo grau são combinados entre si.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Isso mesmo: somamos apenas termos semelhantes (mesmo grau).",
+    timeLimit: 12,
+  },
+  {
+    id: "sp-h1",
+    difficulty: "hard",
+    type: "multiple_choice",
+    question: "Quanto vale (-2m² + 3m - 5) + (6m² - m + 8)?",
+    options: [
+      { text: "4m² + 2m + 3", correct: true },
+      { text: "-8m² + 4m - 13", correct: false },
+      { text: "4m² - 2m + 3", correct: false },
+      { text: "-4m² + 2m + 3", correct: false },
+    ],
+    explanation: "-2m² + 6m² = 4m², 3m - m = 2m e -5 + 8 = 3.",
+    timeLimit: 10,
+  },
+];
+
+export const SUBTRACAO_POLINOMIOS_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "sb-e1",
+    difficulty: "easy",
+    type: "true_false",
+    question: "8x - 3x = 5x.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Subtraindo termos semelhantes: 8x - 3x = 5x.",
+    timeLimit: 15,
+  },
+  {
+    id: "sb-e2",
+    difficulty: "easy",
+    type: "multiple_choice",
+    question: "(5a² + 2a) - (2a² + a) é igual a:",
+    options: [
+      { text: "3a² + a", correct: true },
+      { text: "7a² + 3a", correct: false },
+      { text: "3a² - a", correct: false },
+      { text: "-3a² + a", correct: false },
+    ],
+    explanation: "5a² - 2a² = 3a² e 2a - a = a.",
+    timeLimit: 15,
+  },
+  {
+    id: "sb-m1",
+    difficulty: "medium",
+    type: "multiple_choice",
+    question: "Se P(x) = 4x² + 3x - 2 e Q(x) = x² - 5x + 1, então P(x) - Q(x) é:",
+    options: [
+      { text: "3x² + 8x - 3", correct: true },
+      { text: "5x² - 2x - 1", correct: false },
+      { text: "3x² - 2x - 3", correct: false },
+      { text: "-3x² + 8x - 3", correct: false },
+    ],
+    explanation: "Trocamos os sinais de Q(x): 4x² + 3x - 2 - x² + 5x - 1 = 3x² + 8x - 3.",
+    timeLimit: 12,
+  },
+  {
+    id: "sb-m2",
+    difficulty: "medium",
+    type: "true_false",
+    question: "Na subtração de polinômios, todos os sinais do segundo polinômio devem ser trocados.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Correto: subtrair um polinômio é somar o oposto dele.",
+    timeLimit: 12,
+  },
+  {
+    id: "sb-h1",
+    difficulty: "hard",
+    type: "multiple_choice",
+    question: "Quanto vale (-3m² + 4m + 7) - (2m² - 6m - 1)?",
+    options: [
+      { text: "-5m² + 10m + 8", correct: true },
+      { text: "-m² - 2m + 6", correct: false },
+      { text: "5m² + 10m + 8", correct: false },
+      { text: "-5m² - 2m - 8", correct: false },
+    ],
+    explanation: "Trocando os sinais do segundo polinômio: -3m² + 4m + 7 - 2m² + 6m + 1 = -5m² + 10m + 8.",
+    timeLimit: 10,
+  },
+];
+
+export const MULTIPLICACAO_POLINOMIOS_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "mp-e1",
+    difficulty: "easy",
+    type: "multiple_choice",
+    question: "(x + 2)(x + 1) é igual a:",
+    options: [
+      { text: "x² + 3x + 2", correct: true },
+      { text: "x² + x + 2", correct: false },
+      { text: "x² + 2x + 1", correct: false },
+      { text: "x² + 4x + 2", correct: false },
+    ],
+    explanation: "Distribuindo os termos: x·x + x·1 + 2·x + 2·1 = x² + 3x + 2.",
+    timeLimit: 15,
+  },
+  {
+    id: "mp-e2",
+    difficulty: "easy",
+    type: "true_false",
+    question: "(2x)(3x) = 6x².",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Multiplicamos coeficientes e somamos os expoentes: 2·3 = 6 e x·x = x².",
+    timeLimit: 15,
+  },
+  {
+    id: "mp-m1",
+    difficulty: "medium",
+    type: "multiple_choice",
+    question: "(x + 3)(x - 2) é igual a:",
+    options: [
+      { text: "x² + x - 6", correct: true },
+      { text: "x² - x - 6", correct: false },
+      { text: "x² + 5x - 6", correct: false },
+      { text: "x² + x + 6", correct: false },
+    ],
+    explanation: "Distribuindo: x² - 2x + 3x - 6 = x² + x - 6.",
+    timeLimit: 12,
+  },
+  {
+    id: "mp-m2",
+    difficulty: "medium",
+    type: "true_false",
+    question: "Na multiplicação de polinômios, cada termo do primeiro polinômio multiplica cada termo do segundo.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Isso descreve a propriedade distributiva usada na multiplicação de polinômios.",
+    timeLimit: 12,
+  },
+  {
+    id: "mp-h1",
+    difficulty: "hard",
+    type: "multiple_choice",
+    question: "(2x - 3)(x + 4) é igual a:",
+    options: [
+      { text: "2x² + 5x - 12", correct: true },
+      { text: "2x² - 5x - 12", correct: false },
+      { text: "2x² + 8x - 12", correct: false },
+      { text: "x² + 5x - 12", correct: false },
+    ],
+    explanation: "2x² + 8x - 3x - 12 = 2x² + 5x - 12.",
+    timeLimit: 10,
+  },
+];
