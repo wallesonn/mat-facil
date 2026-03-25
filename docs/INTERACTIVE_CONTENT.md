@@ -56,6 +56,59 @@ As aulas suportam blocos de conteúdo estruturado via JSON:
 | `step_by_step` | Explicação passo a passo |
 | `quiz` | Quiz com alternativas |
 
+## Regras para Criação de Quizzes das Aulas
+
+Os quizzes das aulas seguem um padrão pedagógico e de consistência visual:
+
+- **Banco por aula**
+  - Cada aula com quiz deve ter seu próprio banco de perguntas
+  - As perguntas precisam ficar alinhadas ao conteúdo específico da aula
+
+- **Estrutura mínima do banco**
+  - 2 perguntas fáceis
+  - 2 perguntas médias
+  - 1 pergunta difícil
+  - Total mínimo recomendado: 5 perguntas por aula
+
+- **Seleção da sessão**
+  - A cada tentativa, o sistema monta um quiz com 5 perguntas
+  - Distribuição fixa: 2 fáceis + 2 médias + 1 difícil
+
+- **Pontuação e tempo**
+  - Cada acerto vale 2 XP
+  - Perguntas fáceis: 15s
+  - Perguntas médias: 12s
+  - Perguntas difíceis: 10s
+
+- **Campos obrigatórios em cada pergunta**
+  - `id`
+  - `difficulty`
+  - `type`
+  - `question`
+  - `options`
+  - `explanation`
+  - `timeLimit`
+
+- **Qualidade pedagógica**
+  - Enunciado curto e direto
+  - Apenas uma resposta correta
+  - Distratores plausíveis
+  - Explicação curta mostrando o raciocínio correto
+
+## Bancos de Quiz por Aula
+
+Os bancos atuais cobrem as aulas de:
+
+- `Potenciação de monômios`
+- `Introdução aos polinômios`
+- `Termos, coeficientes e grau`
+- `Exercícios e revisão`
+- `Soma de polinômios`
+- `Subtração de polinômios`
+- `Multiplicação de polinômios`
+
+Cada banco é registrado em `src/data/polynomialQuizQuestions.ts` e ligado ao registry central em `src/data/lessonQuizzes.ts`.
+
 ## Criando Novos Componentes Interativos
 
 1. Crie o componente em `src/components/interactive/`

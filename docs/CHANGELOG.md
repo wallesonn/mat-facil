@@ -2,6 +2,22 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
+## [0.4.1] - 2026-03-25
+
+### Added
+- Bancos de perguntas para as aulas de Álgebra ainda sem quiz:
+  - Introdução aos polinômios
+  - Termos, coeficientes e grau
+  - Exercícios e revisão
+- Regras documentadas para criação de quizzes das aulas
+  - 5 perguntas por sessão
+  - Distribuição padrão: 2 fáceis, 2 médias e 1 difícil
+  - 2 XP por resposta correta
+
+### Changed
+- Registry de quizzes passou a cobrir todas as aulas publicadas do tópico "Operações com Polinômios"
+- Documentação de conteúdo interativo atualizada com o padrão de autoria dos quizzes
+
 ## [0.4.0] - 2026-03-16
 
 ### Added

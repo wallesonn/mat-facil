@@ -1,7 +1,10 @@
 import type { Lesson } from "@/types";
 import { AREA_QUIZ_QUESTIONS, type QuizQuestion } from "@/data/areaQuizQuestions";
 import {
+  EXERCICIOS_REVISAO_QUESTIONS,
+  INTRODUCAO_POLINOMIOS_QUESTIONS,
   MULTIPLICACAO_POLINOMIOS_QUESTIONS,
+  TERMOS_COEFICIENTES_GRAU_QUESTIONS,
   SOMA_POLINOMIOS_QUESTIONS,
   SUBTRACAO_POLINOMIOS_QUESTIONS,
 } from "@/data/polynomialQuizQuestions";
@@ -9,6 +12,9 @@ import {
 export type QuizKey =
   | "area-formas-irregulares"
   | "potenciacao-monomios"
+  | "introducao-polinomios"
+  | "termos-coeficientes-grau"
+  | "exercicios-revisao"
   | "soma-polinomios"
   | "subtracao-polinomios"
   | "multiplicacao-polinomios";
@@ -269,6 +275,21 @@ export const LESSON_QUIZZES: Record<QuizKey, LessonQuizDefinition> = {
     description: "Responda 5 perguntas sobre expoentes, sinais e regras de potenciação em monômios. Cada resposta certa vale 2 XP!",
     questionBank: POTENCIACAO_MONOMIOS_QUESTIONS,
   },
+  "introducao-polinomios": {
+    title: "Quiz: Introdução aos Polinômios",
+    description: "Responda 5 perguntas sobre o conceito, os termos e o grau dos polinômios. Cada resposta certa vale 2 XP!",
+    questionBank: INTRODUCAO_POLINOMIOS_QUESTIONS,
+  },
+  "termos-coeficientes-grau": {
+    title: "Quiz: Termos, Coeficientes e Grau",
+    description: "Responda 5 perguntas sobre identificação de termos, coeficientes e grau dos polinômios. Cada resposta certa vale 2 XP!",
+    questionBank: TERMOS_COEFICIENTES_GRAU_QUESTIONS,
+  },
+  "exercicios-revisao": {
+    title: "Quiz: Exercícios e Revisão",
+    description: "Responda 5 perguntas de revisão para consolidar operações com polinômios. Cada resposta certa vale 2 XP!",
+    questionBank: EXERCICIOS_REVISAO_QUESTIONS,
+  },
   "soma-polinomios": {
     title: "Quiz: Soma de Polinômios",
     description: "Responda 5 perguntas sobre soma de termos semelhantes. Cada resposta certa vale 2 XP!",
@@ -300,6 +321,22 @@ export function getQuizKeyForLesson(lesson: Lesson): QuizKey | null {
 
   if (title.includes("potenciacao de monomios") || title.includes("monomios")) {
     return "potenciacao-monomios";
+  }
+
+  if (title.includes("introducao aos polinomios") || topicTitle.includes("introducao aos polinomios")) {
+    return "introducao-polinomios";
+  }
+
+  if (
+    title.includes("termos coeficientes e grau") ||
+    title.includes("termos, coeficientes e grau") ||
+    topicTitle.includes("termos coeficientes e grau")
+  ) {
+    return "termos-coeficientes-grau";
+  }
+
+  if (title.includes("exercicios e revisao") || topicTitle.includes("exercicios e revisao")) {
+    return "exercicios-revisao";
   }
 
   if (title.includes("soma de polinomios") || topicTitle.includes("soma de polinomios")) {

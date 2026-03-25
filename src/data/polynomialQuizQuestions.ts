@@ -69,6 +69,213 @@ export const SOMA_POLINOMIOS_QUESTIONS: QuizQuestion[] = [
   },
 ];
 
+export const INTRODUCAO_POLINOMIOS_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "ip-e1",
+    difficulty: "easy",
+    type: "true_false",
+    question: "x² + 3x - 5 é um polinômio.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Sim. A expressão tem soma de termos com expoentes inteiros não negativos, então é um polinômio.",
+    timeLimit: 15,
+  },
+  {
+    id: "ip-e2",
+    difficulty: "easy",
+    type: "multiple_choice",
+    question: "Quantos termos tem o polinômio 2x³ - x + 4?",
+    options: [
+      { text: "2 termos", correct: false },
+      { text: "3 termos", correct: true },
+      { text: "4 termos", correct: false },
+      { text: "5 termos", correct: false },
+    ],
+    explanation: "Os termos são 2x³, -x e 4. Portanto, são 3 termos.",
+    timeLimit: 15,
+  },
+  {
+    id: "ip-m1",
+    difficulty: "medium",
+    type: "multiple_choice",
+    question: "Qual é o grau do polinômio 7x⁴ - 2x² + x - 9?",
+    options: [
+      { text: "2", correct: false },
+      { text: "3", correct: false },
+      { text: "4", correct: true },
+      { text: "9", correct: false },
+    ],
+    explanation: "O maior expoente de x é 4, então o grau do polinômio é 4.",
+    timeLimit: 12,
+  },
+  {
+    id: "ip-m2",
+    difficulty: "medium",
+    type: "true_false",
+    question: "Em 5a²b - 3ab + 8, o termo independente é 8.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "O termo independente é aquele sem letra. Aqui, ele é 8.",
+    timeLimit: 12,
+  },
+  {
+    id: "ip-h1",
+    difficulty: "hard",
+    type: "multiple_choice",
+    question: "Qual é o grau do polinômio 4a²b - 2ab + 7?",
+    options: [
+      { text: "2", correct: false },
+      { text: "3", correct: true },
+      { text: "4", correct: false },
+      { text: "5", correct: false },
+    ],
+    explanation: "O termo de maior grau é 4a²b, cujo grau total é 2 + 1 = 3.",
+    timeLimit: 10,
+  },
+];
+
+export const TERMOS_COEFICIENTES_GRAU_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "tcg-e1",
+    difficulty: "easy",
+    type: "true_false",
+    question: "No polinômio 4x² - 3x + 8, o coeficiente de x é -3.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "O termo em x é -3x, então o coeficiente é -3.",
+    timeLimit: 15,
+  },
+  {
+    id: "tcg-e2",
+    difficulty: "easy",
+    type: "multiple_choice",
+    question: "Qual é o termo independente de 5a² - 2a + 9?",
+    options: [
+      { text: "5a²", correct: false },
+      { text: "-2a", correct: false },
+      { text: "9", correct: true },
+      { text: "0", correct: false },
+    ],
+    explanation: "O termo independente é o número sem variável: 9.",
+    timeLimit: 15,
+  },
+  {
+    id: "tcg-m1",
+    difficulty: "medium",
+    type: "multiple_choice",
+    question: "Quantos termos possui o polinômio 7x³ - x² + 4x - 1?",
+    options: [
+      { text: "2 termos", correct: false },
+      { text: "3 termos", correct: false },
+      { text: "4 termos", correct: true },
+      { text: "5 termos", correct: false },
+    ],
+    explanation: "Os termos são 7x³, -x², 4x e -1. Portanto, são 4 termos.",
+    timeLimit: 12,
+  },
+  {
+    id: "tcg-m2",
+    difficulty: "medium",
+    type: "true_false",
+    question: "O grau de 3x⁵ + 2x² - 1 é 5.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "O maior expoente é 5, então o grau do polinômio é 5.",
+    timeLimit: 12,
+  },
+  {
+    id: "tcg-h1",
+    difficulty: "hard",
+    type: "multiple_choice",
+    question: "Em 6m²n³ - 4mn + 8, qual é o grau do polinômio?",
+    options: [
+      { text: "3", correct: false },
+      { text: "4", correct: false },
+      { text: "5", correct: true },
+      { text: "6", correct: false },
+    ],
+    explanation: "O termo de maior grau é 6m²n³. O grau total é 2 + 3 = 5.",
+    timeLimit: 10,
+  },
+];
+
+export const EXERCICIOS_REVISAO_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "er-e1",
+    difficulty: "easy",
+    type: "true_false",
+    question: "3x + 2x = 5x.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Somamos os coeficientes dos termos semelhantes: 3x + 2x = 5x.",
+    timeLimit: 15,
+  },
+  {
+    id: "er-e2",
+    difficulty: "easy",
+    type: "multiple_choice",
+    question: "Quanto vale (-2x)²?",
+    options: [
+      { text: "-4x²", correct: false },
+      { text: "4x²", correct: true },
+      { text: "2x²", correct: false },
+      { text: "-2x²", correct: false },
+    ],
+    explanation: "Ao elevar ao quadrado, o sinal negativo desaparece: (-2)²x² = 4x².",
+    timeLimit: 15,
+  },
+  {
+    id: "er-m1",
+    difficulty: "medium",
+    type: "multiple_choice",
+    question: "Se P(x) = x² + 2x - 1 e Q(x) = 3x² - x + 4, então P(x) + Q(x) é:",
+    options: [
+      { text: "4x² + x + 3", correct: true },
+      { text: "2x² + 3x + 5", correct: false },
+      { text: "4x² - 3x + 3", correct: false },
+      { text: "3x² + x + 3", correct: false },
+    ],
+    explanation: "Somamos os termos semelhantes: x² + 3x² = 4x², 2x - x = x e -1 + 4 = 3.",
+    timeLimit: 12,
+  },
+  {
+    id: "er-m2",
+    difficulty: "medium",
+    type: "true_false",
+    question: "(x + 2)(x + 3) = x² + 5x + 6.",
+    options: [
+      { text: "Verdadeiro", correct: true },
+      { text: "Falso", correct: false },
+    ],
+    explanation: "Distribuindo: x·x + x·3 + 2·x + 2·3 = x² + 5x + 6.",
+    timeLimit: 12,
+  },
+  {
+    id: "er-h1",
+    difficulty: "hard",
+    type: "multiple_choice",
+    question: "Se P(x) = 4x² - 3x + 1 e Q(x) = 2x² + x - 5, então P(x) - Q(x) é:",
+    options: [
+      { text: "2x² - 4x + 6", correct: true },
+      { text: "6x² - 2x - 4", correct: false },
+      { text: "2x² + 4x - 4", correct: false },
+      { text: "-2x² - 4x + 6", correct: false },
+    ],
+    explanation: "Trocando os sinais de Q(x): 4x² - 3x + 1 - 2x² - x + 5 = 2x² - 4x + 6.",
+    timeLimit: 10,
+  },
+];
+
 export const SUBTRACAO_POLINOMIOS_QUESTIONS: QuizQuestion[] = [
   {
     id: "sb-e1",
