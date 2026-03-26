@@ -6,9 +6,13 @@ import { BookOpen, Trophy, Flame, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { SubjectCard } from "@/components/shared/SubjectCard";
 import { XPProgressBar } from "@/components/ui/xp-progress-bar";
-import { getSubjects } from "@/services/subjects";
+import { getSubjects, getTopicCountBySubject } from "@/services/subjects";
 import { calculateLevel } from "@/services/gamification";
 import type { Subject } from "@/types";
+
+type SubjectWithCount = Subject & {
+  topicsCount: number;
+};
 
 function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: string | number; color: string;
@@ -33,14 +37,24 @@ function StatCard({ icon: Icon, label, value, color }: {
 
 export default function DashboardPage() {
   const { profile } = useAuth();
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<SubjectWithCount[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getSubjects().then((data) => {
-      setSubjects(data);
+    async function loadSubjects() {
+      const data = await getSubjects();
+      const subjectsWithCounts = await Promise.all(
+        data.map(async (subject) => ({
+          ...subject,
+          topicsCount: await getTopicCountBySubject(subject.id),
+        }))
+      );
+
+      setSubjects(subjectsWithCounts as SubjectWithCount[]);
       setLoading(false);
-    });
+    }
+
+    loadSubjects();
   }, []);
 
   if (!profile) return null;
@@ -111,7 +125,7 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {subjects.map((subject, i) => (
-              <SubjectCard key={subject.id} subject={subject} index={i} />
+              <SubjectCard key={subject.id} subject={subject} index={i} topicsCount={subject.topicsCount} />
             ))}
           </div>
         )}

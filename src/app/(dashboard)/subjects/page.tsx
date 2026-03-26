@@ -5,21 +5,35 @@ import { motion } from "framer-motion";
 import { BookOpen, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SubjectCard } from "@/components/shared/SubjectCard";
-import { getSubjects } from "@/services/subjects";
+import { getSubjects, getTopicCountBySubject } from "@/services/subjects";
 import type { Subject } from "@/types";
 
+type SubjectWithCount = Subject & {
+  topicsCount: number;
+};
+
 export default function SubjectsPage() {
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [filtered, setFiltered] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<SubjectWithCount[]>([]);
+  const [filtered, setFiltered] = useState<SubjectWithCount[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getSubjects().then((data) => {
-      setSubjects(data);
-      setFiltered(data);
+    async function loadSubjects() {
+      const data = await getSubjects();
+      const subjectsWithCounts = await Promise.all(
+        data.map(async (subject) => ({
+          ...subject,
+          topicsCount: await getTopicCountBySubject(subject.id),
+        }))
+      );
+
+      setSubjects(subjectsWithCounts as SubjectWithCount[]);
+      setFiltered(subjectsWithCounts as SubjectWithCount[]);
       setLoading(false);
-    });
+    }
+
+    loadSubjects();
   }, []);
 
   useEffect(() => {
@@ -61,7 +75,7 @@ export default function SubjectsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((subject, i) => (
-            <SubjectCard key={subject.id} subject={subject} index={i} />
+            <SubjectCard key={subject.id} subject={subject} index={i} topicsCount={subject.topicsCount} />
           ))}
         </div>
       )}

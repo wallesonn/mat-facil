@@ -68,6 +68,17 @@ export async function getTopicsBySubject(subjectId: string): Promise<Topic[]> {
   return data ?? [];
 }
 
+export async function getTopicCountBySubject(subjectId: string): Promise<number> {
+  const supabase = createClient();
+  const { count, error } = await supabase
+    .from("topics")
+    .select("id", { count: "exact", head: true })
+    .eq("subject_id", subjectId);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
 export async function getTopicById(id: string): Promise<Topic | null> {
   const supabase = createClient();
   const { data } = await supabase
