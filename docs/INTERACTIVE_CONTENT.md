@@ -64,11 +64,13 @@ Os quizzes das aulas seguem um padrão pedagógico e de consistência visual:
   - Cada aula com quiz deve ter seu próprio banco de perguntas
   - As perguntas precisam ficar alinhadas ao conteúdo específico da aula
 
-- **Estrutura mínima do banco**
-  - 2 perguntas fáceis
-  - 2 perguntas médias
-  - 1 pergunta difícil
-  - Total mínimo recomendado: 5 perguntas por aula
+- **Estrutura padrão do banco**
+  - Total de 15 perguntas por aula
+  - 6 perguntas fáceis
+  - 6 perguntas médias
+  - 3 perguntas difíceis
+  - 6 questões do tipo `true_false`
+  - 9 questões do tipo `multiple_choice`
 
 - **Seleção da sessão**
   - A cada tentativa, o sistema monta um quiz com 5 perguntas
@@ -108,6 +110,8 @@ Os bancos atuais cobrem as aulas de:
 - `Multiplicação de polinômios`
 
 Cada banco é registrado em `src/data/polynomialQuizQuestions.ts` e ligado ao registry central em `src/data/lessonQuizzes.ts`.
+
+Todos os bancos listados acima devem seguir a estrutura padrão de 15 questões por aula, com 6 fáceis, 6 médias, 3 difíceis, 6 `true_false` e 9 `multiple_choice`.
 
 ## Criando Novos Componentes Interativos
 

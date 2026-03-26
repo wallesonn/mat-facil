@@ -2,6 +2,20 @@
 
 Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 
+## [0.4.2] - 2026-03-26
+
+### Added
+- Padrão completo de bancos de quiz para as aulas:
+  - 15 perguntas por aula
+  - 6 fáceis, 6 médias e 3 difíceis
+  - 6 questões `true_false` e 9 questões `multiple_choice`
+
+### Changed
+- Regra de seleção por tentativa reforçada e documentada:
+  - 5 perguntas por sessão
+  - distribuição fixa de 2 fáceis, 2 médias e 1 difícil
+- Documentação de conteúdo interativo e guia do admin atualizados com o novo padrão dos quizzes
+
 ## [0.4.1] - 2026-03-25
 
 ### Added

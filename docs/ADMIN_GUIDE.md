@@ -29,7 +29,12 @@ WHERE email = 'seu@email.com';
 - Criar, editar e excluir aulas dentro de um assunto
 - Campos: assunto, título, conteúdo (JSON), status (rascunho/publicado), ordem, XP
 - O conteúdo suporta blocos: text, math, image, video, exercise, step_by_step, quiz
-- Para blocos `quiz`, mantenha o padrão do projeto: 5 questões por aula, com 2 fáceis, 2 médias e 1 difícil, cada acerto valendo 2 XP
+- Para blocos `quiz`, mantenha o padrão do projeto:
+  - banco com 15 questões por aula
+  - distribuição fixa de 6 fáceis, 6 médias e 3 difíceis
+  - 6 questões `true_false` e 9 questões `multiple_choice`
+  - em cada tentativa, o sistema sorteia 5 questões com 2 fáceis, 2 médias e 1 difícil
+  - cada acerto vale 2 XP
 - Prefira enunciados curtos, uma única resposta correta e explicações objetivas para cada questão
 
 ### Alunos (`/admin/students`)
