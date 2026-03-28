@@ -5,12 +5,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Timer, Trophy, Zap, Star, CheckCircle2, XCircle, ArrowRight, Sparkles } from "lucide-react";
 import { pickQuizQuestions, type LessonQuizDefinition } from "@/data/lessonQuizzes";
 import { playCorrect, playWrong, playComplete, playTick, playStart } from "@/lib/sounds";
+import { getQuizHint } from "@/lib/quizHints";
 import { getQuizResult, saveQuizResult } from "@/services/quiz";
 import { POINTS } from "@/lib/constants";
 import type { QuizQuestion } from "@/data/areaQuizQuestions";
 
 const XP_PER_QUESTION = POINTS.QUIZ_PER_QUESTION;
 const TOTAL_QUESTIONS = 5;
+
+function DiffBadge({ d }: { d: string }) {
+  const cfg = {
+    easy: { label: "Fácil", cls: "bg-green-500/20 text-green-400" },
+    medium: { label: "Médio", cls: "bg-yellow-500/20 text-yellow-400" },
+    hard: { label: "Difícil", cls: "bg-red-500/20 text-red-400" },
+  }[d] ?? { label: d, cls: "bg-muted text-muted-foreground" };
+
+  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>;
+}
 
 function GridVisual({ grid }: { grid: NonNullable<QuizQuestion["grid"]> }) {
   const cellSize = 36;
@@ -246,15 +257,6 @@ export default function LessonQuizGame({ quiz, userId, lessonId, onComplete }: L
     }
   }
 
-  function DiffBadge({ d }: { d: string }) {
-    const cfg = {
-      easy: { label: "Fácil", cls: "bg-green-500/20 text-green-400" },
-      medium: { label: "Médio", cls: "bg-yellow-500/20 text-yellow-400" },
-      hard: { label: "Difícil", cls: "bg-red-500/20 text-red-400" },
-    }[d] ?? { label: d, cls: "bg-muted text-muted-foreground" };
-    return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>;
-  }
-
   if (phase === "intro") {
     return (
       <motion.div
@@ -438,9 +440,9 @@ export default function LessonQuizGame({ quiz, userId, lessonId, onComplete }: L
           {q.options.map((opt, i) => {
             let optCls = "bg-muted/50 border-border hover:bg-muted hover:border-indigo-500/50";
             if (phase === "feedback") {
-              if (opt.correct) {
+              if (i === selected && isCorrect) {
                 optCls = "bg-green-500/15 border-green-500 text-green-400";
-              } else if (i === selected && !opt.correct) {
+              } else if (i === selected && !isCorrect) {
                 optCls = "bg-red-500/15 border-red-500 text-red-400";
               } else {
                 optCls = "bg-muted/30 border-border opacity-50";
@@ -459,8 +461,8 @@ export default function LessonQuizGame({ quiz, userId, lessonId, onComplete }: L
                 transition={{ duration: 0.4 }}
               >
                 <span className="flex items-center gap-2">
-                  {phase === "feedback" && opt.correct && <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />}
-                  {phase === "feedback" && i === selected && !opt.correct && <XCircle className="w-5 h-5 text-red-400 shrink-0" />}
+                  {phase === "feedback" && i === selected && isCorrect && <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />}
+                  {phase === "feedback" && i === selected && !isCorrect && <XCircle className="w-5 h-5 text-red-400 shrink-0" />}
                   {opt.text}
                 </span>
               </motion.button>
@@ -486,7 +488,7 @@ export default function LessonQuizGame({ quiz, userId, lessonId, onComplete }: L
                 {isCorrect ? <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" /> : <XCircle className="w-4 h-4 mt-0.5 shrink-0" />}
                 <div>
                   <span className="font-semibold">{isCorrect ? "Correto! " : timeLeft === 0 ? "Tempo esgotado! " : "Incorreto! "}</span>
-                  {q.explanation}
+                  {getQuizHint(q)}
                 </div>
               </div>
 

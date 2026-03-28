@@ -2,14 +2,25 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Timer, Trophy, Zap, X, Star, CheckCircle2, XCircle, ArrowRight, Sparkles } from "lucide-react";
+import { Timer, Trophy, Zap, Star, CheckCircle2, XCircle, ArrowRight, Sparkles } from "lucide-react";
 import { pickQuizQuestions, type QuizQuestion } from "@/data/areaQuizQuestions";
 import { playCorrect, playWrong, playComplete, playTick, playStart } from "@/lib/sounds";
+import { getQuizHint } from "@/lib/quizHints";
 import { getQuizResult, saveQuizResult } from "@/services/quiz";
 import { POINTS } from "@/lib/constants";
 
 const XP_PER_QUESTION = POINTS.QUIZ_PER_QUESTION;
 const TOTAL_QUESTIONS = 5;
+
+function DiffBadge({ d }: { d: string }) {
+  const cfg = {
+    easy: { label: "Fácil", cls: "bg-green-500/20 text-green-400" },
+    medium: { label: "Médio", cls: "bg-yellow-500/20 text-yellow-400" },
+    hard: { label: "Difícil", cls: "bg-red-500/20 text-red-400" },
+  }[d] ?? { label: d, cls: "bg-muted text-muted-foreground" };
+
+  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>;
+}
 
 // ─── Grid SVG ───────────────────────────────────────────────
 function GridVisual({ grid }: { grid: NonNullable<QuizQuestion["grid"]> }) {
@@ -240,16 +251,6 @@ export default function QuizAreaGame({ userId, lessonId, onComplete }: QuizAreaG
     }
   }
 
-  // Difficulty badge
-  function DiffBadge({ d }: { d: string }) {
-    const cfg = {
-      easy: { label: "Fácil", cls: "bg-green-500/20 text-green-400" },
-      medium: { label: "Médio", cls: "bg-yellow-500/20 text-yellow-400" },
-      hard: { label: "Difícil", cls: "bg-red-500/20 text-red-400" },
-    }[d] ?? { label: d, cls: "bg-muted text-muted-foreground" };
-    return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>;
-  }
-
   // ─── INTRO ────────────────────────────────────────────────
   if (phase === "intro") {
     return (
@@ -448,9 +449,9 @@ export default function QuizAreaGame({ userId, lessonId, onComplete }: QuizAreaG
           {q.options.map((opt, i) => {
             let optCls = "bg-muted/50 border-border hover:bg-muted hover:border-indigo-500/50";
             if (phase === "feedback") {
-              if (opt.correct) {
+              if (i === selected && isCorrect) {
                 optCls = "bg-green-500/15 border-green-500 text-green-400";
-              } else if (i === selected && !opt.correct) {
+              } else if (i === selected && !isCorrect) {
                 optCls = "bg-red-500/15 border-red-500 text-red-400";
               } else {
                 optCls = "bg-muted/30 border-border opacity-50";
@@ -465,20 +466,12 @@ export default function QuizAreaGame({ userId, lessonId, onComplete }: QuizAreaG
                 className={`relative border rounded-xl px-4 py-3 text-left font-medium transition-all ${optCls} ${
                   phase === "playing" ? "active:scale-[0.98] cursor-pointer" : "cursor-default"
                 }`}
-                animate={
-                  phase === "feedback" && i === selected && !isCorrect
-                    ? { x: [0, -8, 8, -6, 6, 0] }
-                    : {}
-                }
+                animate={phase === "feedback" && i === selected && !isCorrect ? { x: [0, -8, 8, -6, 6, 0] } : {}}
                 transition={{ duration: 0.4 }}
               >
                 <span className="flex items-center gap-2">
-                  {phase === "feedback" && opt.correct && (
-                    <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
-                  )}
-                  {phase === "feedback" && i === selected && !opt.correct && (
-                    <XCircle className="w-5 h-5 text-red-400 shrink-0" />
-                  )}
+                  {phase === "feedback" && i === selected && isCorrect && <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />}
+                  {phase === "feedback" && i === selected && !isCorrect && <XCircle className="w-5 h-5 text-red-400 shrink-0" />}
                   {opt.text}
                 </span>
               </motion.button>
@@ -486,7 +479,6 @@ export default function QuizAreaGame({ userId, lessonId, onComplete }: QuizAreaG
           })}
         </div>
 
-        {/* Feedback */}
         <AnimatePresence>
           {phase === "feedback" && (
             <motion.div
@@ -502,14 +494,10 @@ export default function QuizAreaGame({ userId, lessonId, onComplete }: QuizAreaG
                     : "bg-red-500/10 text-red-400 border border-red-500/20"
                 }`}
               >
-                {isCorrect ? (
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                ) : (
-                  <XCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                )}
+                {isCorrect ? <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" /> : <XCircle className="w-4 h-4 mt-0.5 shrink-0" />}
                 <div>
                   <span className="font-semibold">{isCorrect ? "Correto! " : timeLeft === 0 ? "Tempo esgotado! " : "Incorreto! "}</span>
-                  {q.explanation}
+                  {getQuizHint(q)}
                 </div>
               </div>
 
